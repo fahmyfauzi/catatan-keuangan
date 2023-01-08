@@ -12,7 +12,7 @@ class MoneyController extends Controller
     public function index()
     {
         // $money = Money::latest()->paginate(8);
-        $money = Money::where('user_id', Auth::user()->id)->get();
+        $money = Money::where('user_id', Auth::user()->id)->paginate(8);
 
         return view('pages.index', [
             'moneys' => $money

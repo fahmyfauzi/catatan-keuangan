@@ -41,12 +41,12 @@
                             @endforeach
                         </tbody>
                     </table>
+                    {{ $moneys->links() }}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @include('components.add-modal')
 @include('components.delete-modal')
 @endsection
