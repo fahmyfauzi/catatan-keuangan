@@ -24,4 +24,6 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('moneys', MoneyController::class);
+
+    Route::get('moneys/search', [MoneyController::class, 'index'])->name('moneys.search');
 });

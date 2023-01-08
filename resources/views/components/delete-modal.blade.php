@@ -34,9 +34,22 @@
                             showConfirmButton: false,
                             timer: 3000
                         });
+
+                        let jumlah = `
+                        <tr id="row-sum-moneys">
+                                <th>Jumlah</th>
+                                <td class=""><span>Rp. {{ $masuk }}</span></td>
+                                <td class=""><span>Rp.{{ $keluar }}</span></td>
+                                <td>Sisa</td>
+                                <td>{{ $masuk - $keluar }}</td>
+                            </tr>
+            `;
+                        
                         
                         //remove contact from table
                         $(`#index_${money_id}`).remove();
+                $('#row-sum-moneys').replaceWith(jumlah);
+
                     }
                 });
             }

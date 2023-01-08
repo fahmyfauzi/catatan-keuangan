@@ -19,14 +19,14 @@
                         <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-jumlah"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="phone" class="col-form-label">Phone:</label>
+                        <label for="jenis" class="col-form-label">Jenis:</label>
                         <select id="jenis" name="jenis" class="form-control">
                             <option disabled selected>---pilih jenis uang---</option>
                             </option>
                             <option value="masuk">Masuk</option>
                             <option value="keluar">Keluar</option>
                         </select>
-                        <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-phone"></div>
+                        <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-jenis"></div>
                     </div>
 
 
@@ -55,6 +55,7 @@
         let jenis = $('#jenis').val();
         let token = $("meta[name='csrf-token']").attr("content");
 
+        
         $.ajax({
             url:`moneys`,
             type:'post',
@@ -79,24 +80,43 @@
             let money = `
             <tr id="index_${response.data.id}">
                     <td>${response.data.keterangan}</td>
-                    <td>${response.data.jumlah}</td>
-                    <td>${response.data.jenis}</td>
+                    @if ($money->jenis == 'masuk')
+                                <td class="bg-success text-white"><span>Rp. ${response.data.jumlah}</span></td>
+                                <td>-</td>
+                                @else
+                                <td>-</td>
+                                <td class="bg-warning text-white"><span>Rp.${response.data.jumlah}</span></td>
+                                @endif
                     <td>${moment(response.data.created_at).fromNow()}</td>
 
                     <td>
-                        <a href="javascript:void(0)" id="btn-edit-contact" data-id="${response.data.id}"
+                        <a href="javascript:void(0)" id="btn-edit-money" data-id="${response.data.id}"
                             class="btn btn-warning btn-sm">Edit</a>
-                        <a href="javascript:void(0)" id="btn-delete-contact" data-id="${response.data.id}"
+                        <a href="javascript:void(0)" id="btn-delete-money" data-id="${response.data.id}"
                             class="btn btn-danger btn-sm">Delete</a>
                     </td>
                 </tr>
+                
+            `;
+            let jumlah = `
+            <tr id="row-sum-moneys">
+                                <th>Jumlah</th>
+                                <td class=""><span>Rp.{{ $masuk }}</span></td>
+                                <td class=""><span>Rp.{{ $keluar }}</span></td>
+                                <td>Sisa</td>
+                                <td>{{ $masuk - $keluar }}</td>
+                            </tr>
             `;
              //masukan ke tabel
                 $('#table-moneys').prepend(money);
 
+                // replace ke penjumlahan
+                $('#row-sum-moneys').replaceWith(jumlah);
+
+
                 //clear form
                 $('#user_id').val('');
-                $('#keteranga').val('');
+                $('#keterangan').val('');
                 $('#jumlah').val('');
                 $('#jenis').val('');
 
@@ -126,7 +146,7 @@
                 $('#alert-jenis').addClass('d-block');
                 
                 //add message to alert
-                $('#alert-jenis').html(error.responseJSON.phone[0]);
+                $('#alert-jenis').html(error.responseJSON.jenis[0]);
                 }
                 
             }

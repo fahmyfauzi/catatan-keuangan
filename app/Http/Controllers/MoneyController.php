@@ -9,13 +9,18 @@ use Illuminate\Support\Facades\Validator;
 
 class MoneyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
         // $money = Money::latest()->paginate(8);
-        $money = Money::where('user_id', Auth::user()->id)->latest()->paginate(8);
+        $money = Money::where('user_id', Auth::user()->id)->latest()->paginate(20);
+        $masuk = Money::where(['jenis' => 'masuk'])->sum('jumlah');
+        $keluar = Money::where(['jenis' => 'keluar'])->sum('jumlah');
 
         return view('pages.index', [
-            'moneys' => $money
+            'moneys' => $money,
+            'masuk' => $masuk,
+            'keluar' => $keluar,
         ]);
     }
 
