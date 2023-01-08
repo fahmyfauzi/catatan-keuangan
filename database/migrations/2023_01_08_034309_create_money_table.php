@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('money', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->string('keterangan', 80);
             $table->string('jumlah', 80);
             $table->enum('jenis', ['keluar', 'masuk']);
