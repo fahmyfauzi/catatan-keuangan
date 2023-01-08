@@ -1,26 +1,27 @@
-<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form>
-                    <input type="hidden" name="user_id" id="user_id" value="{{ Auth::user()->id }}">
+                    <input type="hidden" id="user_id" value="{{ Auth::user()->id }}">
+                    <input type="hidden" id="money_id">
                     <div class="mb-3">
-                        <label for="keterangan" class="col-form-label">Keterangan:</label>
-                        <input type="text" class="form-control" id="keterangan">
-                        <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-keterangan"></div>
+                        <label for="keterangan_edit" class="col-form-label">Keterangan:</label>
+                        <input type="text" class="form-control" id="keterangan_edit">
+                        <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-keterangan-edit"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="jumlah" class="col-form-label">Jumlah:</label>
-                        <input type="text" class="form-control" id="jumlah">
-                        <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-jumlah"></div>
+                        <label for="jumlah-edit" class="col-form-label">Jumlah:</label>
+                        <input type="text" class="form-control" id="jumlah_edit">
+                        <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-jumlah-edit"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="phone" class="col-form-label">Phone:</label>
-                        <select id="jenis" name="jenis" class="form-control">
+                        <label for="jenis_edit" class="col-form-label">Phone:</label>
+                        <select id="jenis_edit" name="jenis" class="form-control">
                             <option disabled selected>---pilih jenis uang---</option>
                             </option>
                             <option value="masuk">Masuk</option>
@@ -34,32 +35,48 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="store">Submit</button>
+                <button type="button" class="btn btn-primary" id="storeEdit">Submit</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    $('body').on('click', '#btn-add-money', function () {  
+    $('body').on('click', '#btn-edit-money', function () {  
         //open modal
-        $('#modal-add').modal('show');
+        let money_id = $(this).data('id');
+
+        $.ajax({
+            url:`/moneys/${money_id}`,
+            type:'GET',
+            cache:false,
+            success:function(response){
+                $('#money_id').val(response.data.id);
+                $('#keterangan_edit').val(response.data.keterangan);
+                $('#jumlah_edit').val(response.data.jumlah);
+                $('#jenis_edit').val(response.data.jenis);
+                $('#modal-edit').modal('show');
+            }
+        });
+
 
     });
 
-    $('#store').click(function(e){
+    $('#storeEdit').click(function(e){
         e.preventDefault();
-        let user_id = $('#user_id').val()
-        let keterangan = $('#keterangan').val();
-        let jumlah = $('#jumlah').val();
-        let jenis = $('#jenis').val();
+        let money_id = $('#money_id').val();
+        let user_id = $('#user_id').val();
+        let keterangan = $('#keterangan_edit').val();
+        let jumlah = $('#jumlah_edit').val();
+        let jenis = $('#jenis_edit').val();
         let token = $("meta[name='csrf-token']").attr("content");
 
         $.ajax({
-            url:`moneys`,
-            type:'post',
+            url:`moneys/${money_id}`,
+            type:'PUT',
             cache: false,
             data:{
+                'id':money_id,
                 'user_id':user_id,
                 'keterangan':keterangan,
                 'jumlah':jumlah,
@@ -92,41 +109,35 @@
                 </tr>
             `;
              //masukan ke tabel
-                $('#table-moneys').prepend(money);
-
-                //clear form
-                $('#user_id').val('');
-                $('#keteranga').val('');
-                $('#jumlah').val('');
-                $('#jenis').val('');
+                $(`#index_${response.data.id}`).replaceWith(money);
 
                 //close modal
-                $('#modal-add').modal('hide');
+                $('#modal-edit').modal('hide');
             },
             error:function(error){
                 if(error.responseJSON.keterangan[0]){
                     //show alert
-                    $('#alert-keterangan').removeClass('d-none');
-                    $('#alert-keterangan').addClass('d-block');
+                    $('#alert-keterangan-edit').removeClass('d-none');
+                    $('#alert-keterangan-edit').addClass('d-block');
                     
                     //add message to alert
-                    $('#alert-keterangan').html(error.responseJSON.keterangan[0]);
+                    $('#alert-keterangan-edit').html(error.responseJSON.keterangan[0]);
                 }
                 if(error.responseJSON.jumlah[0]){
                 //show alert
-                $('#alert-jumlah').removeClass('d-none');
-                $('#alert-jumlah').addClass('d-block');
+                $('#alert-jumlah-edit').removeClass('d-none');
+                $('#alert-jumlah-edit').addClass('d-block');
                 
                 //add message to alert
-                $('#alert-jumlah').html(error.responseJSON.jumlah[0]);
+                $('#alert-jumlah-edit').html(error.responseJSON.jumlah[0]);
                 }
                 if(error.responseJSON.jenis[0]){
                 //show alert
-                $('#alert-jenis').removeClass('d-none');
-                $('#alert-jenis').addClass('d-block');
+                $('#alert-jenis-edit').removeClass('d-none');
+                $('#alert-jenis-edit').addClass('d-block');
                 
                 //add message to alert
-                $('#alert-jenis').html(error.responseJSON.phone[0]);
+                $('#alert-jenis-edit').html(error.responseJSON.phone[0]);
                 }
                 
             }

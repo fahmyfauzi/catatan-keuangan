@@ -48,5 +48,6 @@
     </div>
 </div>
 @include('components.add-modal')
+@include('components.edit-modal')
 @include('components.delete-modal')
 @endsection

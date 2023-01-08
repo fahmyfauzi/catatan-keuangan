@@ -12,7 +12,7 @@ class MoneyController extends Controller
     public function index()
     {
         // $money = Money::latest()->paginate(8);
-        $money = Money::where('user_id', Auth::user()->id)->paginate(8);
+        $money = Money::where('user_id', Auth::user()->id)->latest()->paginate(8);
 
         return view('pages.index', [
             'moneys' => $money
@@ -43,6 +43,46 @@ class MoneyController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Data Berhasil Ditambahkan!',
+            'data' => $money
+        ]);
+    }
+
+    public function show(Money $money)
+    {
+        //menampilkan data contact
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Ditampilkan',
+            'data' => $money
+        ]);
+    }
+
+    public function update(Request $request, Money $money)
+    {
+        //cek validasi
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'user_id' => 'required',
+            'keterangan' => 'required',
+            'jumlah' => 'required',
+            'jenis' => 'required',
+        ]);
+
+        //cek validasi salah
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+        //update store
+        $money->update([
+            'user_id' => Auth::user()->id,
+            'keterangan' => $request->keterangan,
+            'jumlah' => $request->jumlah,
+            'jenis' => $request->jenis,
+        ]);
+        //berhasil
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Berhasil diupdate',
             'data' => $money
         ]);
     }
